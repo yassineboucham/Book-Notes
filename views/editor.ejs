@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookNote - <%= title %></title>
+    
+    <!-- Blocknote CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/@blocknote/core@0.15.0/style.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@blocknote/mantine@0.15.0/style.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: #e5e5e5;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 100%;
+            height: 100vh;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: #1a1a1a;
+            color: #e5e5e5;
+            padding: 20px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            margin: 0;
+            opacity: 0.7;
+            font-size: 14px;
+        }
+        
+        .editor-container {
+            flex: 1;
+            padding: 0;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            padding: 12px 20px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 6px 12px;
+            border: 1px solid #404040;
+            background: #2a2a2a;
+            color: #e5e5e5;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: #404040;
+            border-color: #555;
+        }
+        
+        .btn.success {
+            background: #0d7377;
+            color: white;
+            border-color: #0d7377;
+        }
+        
+        .btn.success:hover {
+            background: #0a5d61;
+        }
+        
+        .status {
+            margin: 10px 20px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #1a4d4d;
+            color: #4ade80;
+            border: 1px solid #0d7377;
+        }
+        
+        .status.error {
+            background: #4d1a1a;
+            color: #f87171;
+            border: 1px solid #dc2626;
+        }
+        
+        #editor {
+            flex: 1;
+            margin: 20px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background: #1a1a1a;
+            min-height: calc(100vh - 200px);
+        }
+        
+        /* Dark theme for BlockNote */
+        .bn-container {
+            background: #1a1a1a !important;
+            color: #e5e5e5 !important;
+        }
+        
+        .bn-editor {
+            background: #1a1a1a !important;
+            color: #e5e5e5 !important;
+        }
+        
+        .ProseMirror {
+            background: #1a1a1a !important;
+            color: #e5e5e5 !important;
+            padding: 20px !important;
+        }
+        
+        .ProseMirror p {
+            color: #e5e5e5 !important;
+        }
+        
+        .ProseMirror h1, .ProseMirror h2, .ProseMirror h3 {
+            color: #e5e5e5 !important;
+        }
+        
+        .bn-formatting-toolbar {
+            background: #2a2a2a !important;
+            border: 1px solid #404040 !important;
+        }
+        
+        .bn-formatting-toolbar button {
+            background: #2a2a2a !important;
+            color: #e5e5e5 !important;
+            border: none !important;
+        }
+        
+        .bn-formatting-toolbar button:hover {
+            background: #404040 !important;
+        }
+        
+        .bn-side-menu {
+            background: #2a2a2a !important;
+        }
+        
+        .bn-side-menu button {
+            color: #e5e5e5 !important;
+        }
+        
+        .bn-slash-menu {
+            background: #2a2a2a !important;
+            border: 1px solid #404040 !important;
+        }
+        
+        .bn-slash-menu-item {
+            color: #e5e5e5 !important;
+        }
+        
+        .bn-slash-menu-item:hover {
+            background: #404040 !important;
+        }
+        
+        /* Rating stars */
+        .rating-container {
+            padding: 15px 20px;
+            background: #2a2a2a;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .rating-label {
+            font-weight: 500;
+            color: #e5e5e5;
+            font-size: 14px;
+        }
+        
+        .stars {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .star {
+            font-size: 20px;
+            color: #404040;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .star:hover,
+        .star.active {
+            color: #fbbf24;
+            transform: scale(1.1);
+        }
+        
+        .star:hover ~ .star {
+            color: #404040;
+        }
+        
+        .rating-display {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .book-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .book-field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .book-field label {
+            font-size: 13px;
+            color: #94a3b8;
+            min-width: 50px;
+        }
+        
+        .book-field input {
+            background: #1a1a1a;
+            border: 1px solid #404040;
+            color: #e5e5e5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            width: 120px;
+        }
+        
+        .book-field input:focus {
+            outline: none;
+            border-color: #60a5fa;
+        }
+        
+        /* Blue highlight for the specific text */
+        .blue-text {
+            color: #60a5fa !important;
+            background: rgba(96, 165, 250, 0.1);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 BookNote - Digital Reading Journal</h1>
+            <p>Capture your thoughts, insights, and ratings for every book you read</p>
+        </div>
+        
+        <div class="rating-container">
+            <div class="rating-label">Rate this book:</div>
+            <div class="stars" id="rating-stars">
+                <span class="star" data-rating="1">⭐</span>
+                <span class="star" data-rating="2">⭐</span>
+                <span class="star" data-rating="3">⭐</span>
+                <span class="star" data-rating="4">⭐</span>
+                <span class="star" data-rating="5">⭐</span>
+            </div>
+            <div class="rating-display" id="rating-display">No rating yet</div>
+            
+            <div class="book-info">
+                <div class="book-field">
+                    <label>Title:</label>
+                    <input type="text" id="book-title" placeholder="Book title...">
+                </div>
+                <div class="book-field">
+                    <label>Author:</label>
+                    <input type="text" id="book-author" placeholder="Author name...">
+                </div>
+                <div class="book-field">
+                    <label>Genre:</label>
+                    <input type="text" id="book-genre" placeholder="Genre...">
+                </div>
+            </div>
+        </div>
+        
+        <div class="editor-container">
+            <div class="toolbar">
+                <button class="btn" onclick="insertQuote()">💬 Add Quote</button>
+                <button class="btn" onclick="insertReflection()">💭 Add Reflection</button>
+                <button class="btn" onclick="insertBookmark()">🔖 Add Bookmark</button>
+                <button class="btn" onclick="toggleHighlight()">🖍️ Highlight</button>
+                <button class="btn" onclick="exportContent()">📤 Export Notes</button>
+                <button class="btn success" onclick="saveBookNote()">💾 Save Book Note</button>
+            </div>
+            
+        
+            <textarea id="editor" placeholder="Start writing your book notes..."></textarea>
+            
+            
+            <div id="status" class="status"></div>
+        </div>
+    </div>
+
+    <!-- Blocknote JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@blocknote/core@0.15.0/dist/index.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@blocknote/mantine@0.15.0/dist/index.browser.min.js"></script>
+
+    <script>
+        let editor;
+        let currentRating = 0;
+        
+        // Initialize the editor
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Create the editor with dark theme and custom styles
+                editor = window.BlockNote.createBlockNoteEditor({
+                    domAttributes: {
+                        editor: {
+                            class: "editor-content",
+                            "data-test": "editor"
+                        }
+                    },
+                    theme: "dark"
+                });
+                
+                // Mount the editor
+                const editorElement = document.getElementById('editor');
+                editor.mount(editorElement);
+                
+                // Set initial content for book notes
+                const initialContent = [
+                    {
+                        type: "heading",
+                        content: [{ type: "text", text: "📖 My Reading Notes", styles: {} }],
+                        props: { level: 1 }
+                    },
+                    {
+                        type: "paragraph",
+                        content: [{ type: "text", text: "Start writing your thoughts about this book below. Use the toolbar to add quotes, reflections, and bookmarks!", styles: {} }]
+                    },
+                    {
+                        type: "paragraph",
+                        content: [{ type: "text", text: "", styles: {} }]
+                    }
+                ];
+                
+                editor.replaceBlocks(editor.document, initialContent);
+                
+                // Initialize rating system
+                initializeRatingSystem();
+                
+                console.log('BookNote editor initialized successfully');
+            } catch (error) {
+                console.error('Error initializing editor:', error);
+                showStatus('Failed to initialize editor', 'error');
+            }
+        });
+        
+        // Initialize rating system
+        function initializeRatingSystem() {
+            const stars = document.querySelectorAll('.star');
+            const ratingDisplay = document.getElementById('rating-display');
+            
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    currentRating = index + 1;
+                    updateRatingDisplay();
+                });
+                
+                star.addEventListener('mouseenter', () => {
+                    highlightStars(index + 1);
+                });
+            });
+            
+            document.getElementById('rating-stars').addEventListener('mouseleave', () => {
+                highlightStars(currentRating);
+            });
+        }
+        
+        function highlightStars(rating) {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+        
+        function updateRatingDisplay() {
+            const ratingDisplay = document.getElementById('rating-display');
+            const ratingTexts = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+            ratingDisplay.textContent = `${currentRating}/5 - ${ratingTexts[currentRating]}`;
+            highlightStars(currentRating);
+        }
+        
+        // Load content from server
+        async function loadContent() {
+            try {
+                const response = await fetch('/editor/load');
+                const data = await response.json();
+                
+                if (data.content && data.content.length > 0) {
+                    editor.replaceBlocks(editor.document, data.content);
+                }
+                
+                // Load book info and rating
+                if (data.bookInfo) {
+                    document.getElementById('book-title').value = data.bookInfo.title || '';
+                    document.getElementById('book-author').value = data.bookInfo.author || '';
+                    document.getElementById('book-genre').value = data.bookInfo.genre || '';
+                    currentRating = data.bookInfo.rating || 0;
+                    updateRatingDisplay();
+                }
+            } catch (error) {
+                console.error('Error loading content:', error);
+            }
+        }
+        
+        // Save book note with rating and book info
+        async function saveBookNote() {
+            try {
+                const content = editor.document;
+                const bookInfo = {
+                    title: document.getElementById('book-title').value,
+                    author: document.getElementById('book-author').value,
+                    genre: document.getElementById('book-genre').value,
+                    rating: currentRating
+                };
+                
+                const response = await fetch('/editor/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content, bookInfo })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus('Book note saved successfully!', 'success');
+                } else {
+                    showStatus('Failed to save book note', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving book note:', error);
+                showStatus('Error saving book note', 'error');
+            }
+        }
+        
+        // Insert a quote block
+        function insertQuote() {
+            const quote = [
+                {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "💬 Quote", styles: { bold: true, textColor: "#60a5fa" } }]
+                },
+                {
+                    type: "paragraph",
+                    content: [{ type: "text", text: '"Add your favorite quote here..."', styles: { italic: true } }]
+                },
+                {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "— Page number: ", styles: { textColor: "#94a3b8" } }]
+                },
+                {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "", styles: {} }]
+                }
+            ];
+            
+            editor.insertBlocks(quote, editor.getTextCursorPosition().block, "after");
+            showStatus('Quote template added!', 'success');
+        }
+        
+        // Insert a reflection block
+        function insertReflection() {
+            const reflection = [
+                {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "💭 My Thoughts", styles: { bold: true, textColor: "#a78bfa" } }]
+                },
+                {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "What did this passage make me think about? How does it connect to my own experiences or other books I've read?", styles: {} }]
+                },
+                {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "", styles: {} }]
+                }
+            ];
+            
+            editor.insertBlocks(reflection, editor.getTextCursorPosition().block, "after");
+            showStatus('Reflection template added!', 'success');
+        }
+        
+        // Insert a bookmark/important note
+        function insertBookmark() {
+            const bookmark = [
+                {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "🔖 Important Note", styles: { bold: true, textColor: "#f59e0b" } }]
+                },
+                {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Key concept or important information to remember:", styles: {} }]
+                },
+                {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "", styles: {} }]
+                }
+            ];
+            
+            editor.insertBlocks(bookmark, editor.getTextCursorPosition().block, "after");
+            showStatus('Bookmark template added!', 'success');
+        }
+        
+        // Toggle highlight style
+        function toggleHighlight() {
+            try {
+                const selection = editor.getSelection();
+                if (selection) {
+                    editor.toggleStyles({
+                        backgroundColor: "#fbbf2480"
+                    });
+                    showStatus('Text highlighted!', 'success');
+                } else {
+                    showStatus('Please select some text first', 'error');
+                }
+            } catch (error) {
+                console.error('Error highlighting text:', error);
+                showStatus('Error highlighting text', 'error');
+            }
+        }
+        
+        // Export content as formatted book note
+        async function exportContent() {
+            try {
+                const html = await editor.blocksToHTMLLossy(editor.document);
+                const bookInfo = {
+                    title: document.getElementById('book-title').value,
+                    author: document.getElementById('book-author').value,
+                    genre: document.getElementById('book-genre').value,
+                    rating: currentRating
+                };
+                
+                const ratingStars = '⭐'.repeat(currentRating) + '☆'.repeat(5 - currentRating);
+                
+                const fullReport = `
+                <h1>📚 Book Note</h1>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h2>${bookInfo.title || 'Untitled Book'}</h2>
+                    <p><strong>Author:</strong> ${bookInfo.author || 'Unknown'}</p>
+                    <p><strong>Genre:</strong> ${bookInfo.genre || 'Not specified'}</p>
+                    <p><strong>Rating:</strong> ${ratingStars} (${currentRating}/5)</p>
+                </div>
+                ${html}
+                `;
+                
+                // Create a downloadable file
+                const blob = new Blob([fullReport], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${bookInfo.title || 'book-note'}.html`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showStatus('Book note exported successfully!', 'success');
+            } catch (error) {
+                console.error('Error exporting book note:', error);
+                showStatus('Error exporting book note', 'error');
+            }
+        }
+        
+        // Show status message
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            statusEl.style.display = 'block';
+            
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

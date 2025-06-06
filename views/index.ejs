@@ -1,0 +1,28 @@
+<%- include('partials/header.ejs') %>
+<div class="container text-center" style="margin-top: 20px; padding: 20px;">
+    <div class="row align-items-start">
+      <div class="col" style="margin: 20px;">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Add New Book</h5>
+            <p class="card-text">Click to add a new book to the collection.</p>
+            <a href="/add-book" class="btn btn-primary">Add Book</a>
+          </div>
+        </div>
+      </div>
+      <% for (let i = 0; i < books.length; i++) { %>
+      <div class="col" style="margin: 20px;">
+        <div class="card" style="width: 18rem;">
+          <img src="..." class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title"><%= books[i].title %></h5>
+            <p class="card-text"><%= books[i].summary %></p>
+            <p class="card-text">Category: <%= books[i].category %></p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+          </div>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+<%- include('partials/footer.ejs') %>

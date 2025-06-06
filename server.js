@@ -1,35 +1,37 @@
-require('dotenv').config();
+// server.js
 const express = require('express');
 const path = require('path');
-const methodOverride = require('method-override');
-const connectDB = require('./config/db');
-
-// Initialize express
 const app = express();
+const bookRoutes = require('./routes/books');
+const newBookRoutes = require('./routes/new_book');
+const noteRoutes = require('./routes/note');
+const editorRouter = require('./routes/editor');
 
-// Connect to database
-connectDB();
-
-// Set view engine
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(methodOverride('_method'));
+// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-// Routes
-app.use('/', require('./routes/books'));
+// Create uploads directory if it doesn't exist
+const fs = require('fs');
+const uploadsDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)){
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).render('error', { message: 'Something went wrong!' });
-});
+// Main route handlers
+app.use('/', bookRoutes);
+app.use('/', newBookRoutes);
+app.use('/', noteRoutes);
+app.use('/editor', editorRouter);
+
 
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-}); 
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
