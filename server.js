@@ -5,7 +5,6 @@ const app = express();
 const bookRoutes = require('./routes/books');
 const newBookRoutes = require('./routes/new_book');
 const noteRoutes = require('./routes/note');
-const editorRouter = require('./routes/editor');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -26,8 +25,7 @@ if (!fs.existsSync(uploadsDir)){
 // Main route handlers
 app.use('/', bookRoutes);
 app.use('/', newBookRoutes);
-app.use('/', noteRoutes);
-app.use('/editor', editorRouter);
+app.use('/note', noteRoutes);
 
 
 // Start server
