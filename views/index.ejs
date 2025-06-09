@@ -13,11 +13,13 @@
       <% for (let i = 0; i < books.length; i++) { %>
       <div class="col" style="margin: 20px;">
         <div class="card" style="width: 18rem;">
-          <img src="..." class="card-img-top" alt="...">
+          <img src="/uploads/<%= books[i].cover %>" class="card-img-top" alt="...">
           <div class="card-body">
             <h5 class="card-title"><%= books[i].title %></h5>
             <p class="card-text"><%= books[i].summary %></p>
             <p class="card-text">Category: <%= books[i].category %></p>
+            <p class="card-text">Author: <%= books[i].author %></p>
+            <p class="card-text">Added: <%= new Date(books[i].created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
             <a href="#" class="btn btn-primary">Go somewhere</a>
           </div>
         </div>

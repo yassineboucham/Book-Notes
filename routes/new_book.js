@@ -42,7 +42,7 @@ router.post('/add-book', upload.single('img'), async (req, res) => {
             'INSERT INTO book (title, author, summary, category, cover, notes) VALUES ($1, $2, $3, $4, $5, $6)',
             [title, author, summary, category, cover, notes]
         );
-        res.redirect('/book'); // or wherever you want to redirect after adding
+        res.redirect('/note'); // or wherever you want to redirect after adding
     } catch (error) {
         console.error(error);
         res.status(500).send('Error adding book');
